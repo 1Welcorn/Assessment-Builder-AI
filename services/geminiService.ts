@@ -1,3 +1,5 @@
+// Fix: Add reference to Vite client types to resolve `import.meta.env`.
+/// <reference types="vite/client" />
 
 import { GoogleGenAI, Type } from "@google/genai";
 import { Question, QuestionType } from '../types';
@@ -11,12 +13,12 @@ const getAI = (): GoogleGenAI => {
         return ai;
     }
     
-    // FIX: Use process.env.API_KEY to access the API key as per guidelines.
-    const apiKey = process.env.API_KEY;
+    // CORRECT: Use import.meta.env.VITE_API_KEY for client-side environment variables in Vite.
+    const apiKey = import.meta.env.VITE_API_KEY;
     if (!apiKey) {
         // This error will be caught by the calling function's try/catch block.
         // The App-level ApiKeyChecker should prevent this from being called in the first place.
-        throw new Error("API_KEY environment variable not set. AI features are disabled.");
+        throw new Error("VITE_API_KEY environment variable not set. AI features are disabled.");
     }
     
     ai = new GoogleGenAI({ apiKey });
