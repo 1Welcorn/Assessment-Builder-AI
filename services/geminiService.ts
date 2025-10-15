@@ -1,9 +1,29 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { Question, QuestionType } from '../types';
 
-// FIX: Initialize the GoogleGenAI client according to guidelines.
-// The API key must be available as an environment variable `process.env.API_KEY`.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Use a singleton pattern to lazy-initialize the AI client.
+// This prevents the app from crashing on load if the API key is not set.
+let ai: GoogleGenAI | null = null;
+
+const getAI = (): GoogleGenAI => {
+    if (ai) {
+        return ai;
+    }
+    
+    // FIX: Use process.env.API_KEY to access the API key as per guidelines.
+    // This application requires the API_KEY environment variable to be set.
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+        // This error will be caught by the calling function's try/catch block.
+        // The App-level ApiKeyChecker should prevent this from being called in the first place.
+        throw new Error("API_KEY environment variable not set. AI features are disabled.");
+    }
+    
+    ai = new GoogleGenAI({ apiKey });
+    return ai;
+};
+
 
 const questionSchema = {
     type: Type.OBJECT,
@@ -31,10 +51,9 @@ const questionSchema = {
 };
 
 
-// FIX: Implement suggestClassification with a real API call.
 export const suggestClassification = async (questionText: string): Promise<{ bncc: string; descritor: string; difficulty: 'Easy' | 'Medium' | 'Hard' }> => {
     try {
-        const response = await ai.models.generateContent({
+        const response = await getAI().models.generateContent({
             model: "gemini-2.5-flash",
             contents: `Given the question "${questionText}", classify it according to the Brazilian educational standards. Provide one BNCC code, one Descritor code, and a difficulty level ('Easy', 'Medium', or 'Hard').`,
             config: {
@@ -61,10 +80,9 @@ export const suggestClassification = async (questionText: string): Promise<{ bnc
     }
 };
 
-// FIX: Implement suggestAlternativePhrasing with a real API call.
 export const suggestAlternativePhrasing = async (questionText: string): Promise<string[]> => {
     try {
-        const response = await ai.models.generateContent({
+        const response = await getAI().models.generateContent({
             model: 'gemini-2.5-flash',
             contents: `Generate 3 alternative phrasings for the following question: "${questionText}"`,
             config: {
@@ -82,7 +100,6 @@ export const suggestAlternativePhrasing = async (questionText: string): Promise<
     }
 };
 
-// FIX: Implement generateDistractors with a real API call.
 export const generateDistractors = async (question: Question): Promise<string[]> => {
     try {
         const correctAnswer = question.alternatives.find(a => a.isCorrect)?.text;
@@ -91,7 +108,7 @@ export const generateDistractors = async (question: Question): Promise<string[]>
             return [];
         }
         const prompt = `For the multiple-choice question "${question.text}", the correct answer is "${correctAnswer}". Generate 3 plausible but incorrect answer choices (distractors).`;
-        const response = await ai.models.generateContent({
+        const response = await getAI().models.generateContent({
             model: 'gemini-2.5-flash',
             contents: prompt,
             config: {
@@ -109,10 +126,9 @@ export const generateDistractors = async (question: Question): Promise<string[]>
     }
 };
 
-// FIX: Implement generateQuestion with a real API call.
 export const generateQuestion = async (topic: string): Promise<Question> => {
     try {
-        const response = await ai.models.generateContent({
+        const response = await getAI().models.generateContent({
             model: "gemini-2.5-flash",
             contents: `Generate a medium-difficulty multiple-choice question about "${topic}". Include one correct answer and three incorrect distractors. Also suggest a subject, one BNCC code, and one Descritor code. The difficulty must be 'Easy', 'Medium', or 'Hard'. Ensure there is only one correct answer.`,
             config: {
@@ -148,7 +164,7 @@ export const extractQuestionsFromPdf = async (pdfBase64: string): Promise<Questi
 Ensure that for multiple-choice questions, only one alternative has \`isCorrect\` set to true. If you cannot determine the content, return an empty array.`;
 
     try {
-        const response = await ai.models.generateContent({
+        const response = await getAI().models.generateContent({
             model: "gemini-2.5-flash",
             contents: [
                 {

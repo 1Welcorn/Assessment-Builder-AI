@@ -163,7 +163,12 @@ const SettingsPage = () => {
     );
 }
 
-const NavItem = ({ to, children }: { to: string, children: React.ReactNode }) => {
+// FIX: Added an explicit interface for NavItem props to resolve typing issue.
+interface NavItemProps {
+  to: string;
+  children: React.ReactNode;
+}
+const NavItem = ({ to, children }: NavItemProps) => {
     return (
         <NavLink
             to={to}
@@ -216,10 +221,40 @@ const MainLayout = () => {
     );
 };
 
+// FIX: Added explicit props interface for ApiKeyChecker to resolve typing issue.
+interface ApiKeyCheckerProps {
+    children: React.ReactNode;
+}
+const ApiKeyChecker = ({ children }: ApiKeyCheckerProps) => {
+    // FIX: Use process.env.API_KEY as per guidelines.
+    const apiKey = process.env.API_KEY;
+
+    if (!apiKey) {
+        return (
+            <div className="flex h-screen items-center justify-center bg-slate-100 p-4">
+                <div className="text-center p-8 bg-white shadow-lg rounded-lg max-w-lg border border-red-200">
+                    <h1 className="text-2xl font-bold text-red-700">Configuration Error</h1>
+                    <p className="mt-4 text-gray-700">
+                        The AI features of this application require a Google Gemini API key, which has not been configured.
+                    </p>
+                    <p className="mt-2 text-gray-600 text-sm">
+                        {/* FIX: Updated instructions to use API_KEY environment variable. */}
+                        To enable AI functionality, please create an environment variable named <code className="bg-red-100 text-red-800 px-1 py-0.5 rounded font-mono">API_KEY</code> with your API key as the value, and then restart the application.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    return <>{children}</>;
+};
+
 const App = () => {
   return (
     <HashRouter>
-        <MainLayout />
+        <ApiKeyChecker>
+            <MainLayout />
+        </ApiKeyChecker>
     </HashRouter>
   );
 };
