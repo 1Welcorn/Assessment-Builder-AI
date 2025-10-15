@@ -4,6 +4,7 @@ import { Question, QuestionType } from '../types';
 import QuestionCard from '../components/QuestionCard';
 import Modal from '../components/Modal';
 import * as geminiService from '../services/geminiService';
+import { Icons } from '../components/Icons';
 
 const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -103,37 +104,30 @@ const QuestionBankEditor: React.FC = () => {
 
     return (
         <div className="p-8">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800">Question Bank Editor</h1>
-                <div className="flex gap-2">
-                    <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50">
-                        <GoogleDriveIcon /> Save to Google Drive
-                    </button>
-                    <button onClick={() => alert('Previewing Export...')} className="px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-md hover:bg-gray-800">
-                        Preview Export
-                    </button>
-                </div>
-            </div>
-
             <div className="bg-white p-4 rounded-lg shadow-sm border mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                    <input
-                        type="text"
-                        placeholder="Search questions..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="md:col-span-2 w-full p-2 border rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    />
-                    <select className="p-2 border rounded-md bg-white">
+                    <div className="md:col-span-2 relative">
+                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                             <Icons.Search className="h-4 w-4 text-slate-400" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search questions by text..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full p-2 pl-9 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        />
+                    </div>
+                    <select className="p-2 border rounded-lg bg-white w-full">
                         <option>All Subjects</option>
                         {SUBJECTS.map(s => <option key={s}>{s}</option>)}
                     </select>
-                    <select className="p-2 border rounded-md bg-white">
+                    <select className="p-2 border rounded-lg bg-white w-full">
                         <option>All Difficulties</option>
                         {DIFFICULTIES.map(d => <option key={d}>{d}</option>)}
                     </select>
-                    <button className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700">
-                        Filter
+                    <button className="px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors">
+                        Apply Filters
                     </button>
                 </div>
             </div>
@@ -142,11 +136,9 @@ const QuestionBankEditor: React.FC = () => {
                  <button 
                     onClick={handlePdfImportClick} 
                     disabled={isImporting}
-                    className="flex items-center gap-2 px-5 py-2 font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-100 shadow-sm disabled:bg-gray-200 disabled:cursor-wait"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 shadow-sm disabled:bg-slate-100 disabled:cursor-wait transition-colors"
                  >
-                    {isImporting ? (
-                         <svg className="animate-spin h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    ) : '📄'}
+                    {isImporting ? <Icons.Spinner /> : <Icons.PDF className="w-4 h-4" />}
                     {isImporting ? 'Importing...' : 'Import from PDF'}
                  </button>
                  <input
@@ -156,23 +148,25 @@ const QuestionBankEditor: React.FC = () => {
                     accept=".pdf"
                     className="hidden"
                 />
-                 <button onClick={() => setIsGeneratorModalOpen(true)} className="flex items-center gap-2 px-5 py-2 font-semibold text-primary-700 bg-primary-100 rounded-md hover:bg-primary-200 shadow-sm">
-                    <AIIcon /> Generate with AI
-                </button>
-                <button onClick={handleAddNewQuestion} className="px-5 py-2 font-semibold text-white bg-primary-600 rounded-md hover:bg-primary-700 shadow-sm">
-                    Add New Question
+                 <button onClick={() => setIsGeneratorModalOpen(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 shadow-sm transition-colors">
+                    <AIIcon className="w-4 h-4" /> Generate with AI
                 </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {filteredQuestions.map(q => (
+                {filteredQuestions.length > 0 ? filteredQuestions.map(q => (
                     <QuestionCard 
                         key={q.id} 
                         question={q}
                         onUpdate={handleUpdateQuestion}
                         onDelete={handleDeleteQuestion}
                     />
-                ))}
+                )) : (
+                    <div className="lg:col-span-2 text-center py-16 px-6 bg-white rounded-lg border shadow-sm">
+                        <h3 className="text-lg font-semibold text-slate-800">No Questions Found</h3>
+                        <p className="text-slate-500 mt-2">Your search did not match any questions. Try a different search term or clear the filters.</p>
+                    </div>
+                )}
             </div>
 
             <Modal
@@ -181,25 +175,25 @@ const QuestionBankEditor: React.FC = () => {
                 title="Generate Question with AI"
                 footer={
                     <>
-                        <button onClick={() => setIsGeneratorModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">Cancel</button>
+                        <button onClick={() => setIsGeneratorModalOpen(false)} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">Cancel</button>
                         <button 
                             onClick={handleGenerateQuestion} 
                             disabled={isGenerating || !generationTopic.trim()}
-                            className="ml-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 disabled:bg-primary-300 disabled:cursor-not-allowed flex items-center"
+                            className="ml-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:bg-primary-300 disabled:cursor-not-allowed flex items-center transition-colors"
                         >
-                            {isGenerating && <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>}
-                            {isGenerating ? 'Generating...' : 'Generate'}
+                            {isGenerating && <Icons.Spinner />}
+                            {isGenerating ? 'Generating...' : 'Generate Question'}
                         </button>
                     </>
                 }
             >
-                <p className="text-gray-600 mb-4">Enter a topic or subject, and AI will create a new question for you.</p>
+                <p className="text-slate-600 mb-4">Enter a topic or subject, and AI will create a new question for you.</p>
                 <input
                     type="text"
                     value={generationTopic}
                     onChange={(e) => setGenerationTopic(e.target.value)}
                     placeholder="e.g., 'Solar System Planets' or 'French Revolution'"
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary-500"
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                     autoFocus
                 />
             </Modal>

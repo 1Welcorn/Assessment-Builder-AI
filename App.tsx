@@ -1,43 +1,37 @@
-
 import React, { useState } from 'react';
 import { HashRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import QuestionBankEditor from './pages/QuestionBankEditor';
 import AssessmentBuilder from './pages/AssessmentBuilder';
 import { MOCK_ASSESSMENTS, MOCK_TEMPLATES, MOCK_BNCC, MOCK_DESCRITORES, GoogleDriveIcon } from './constants';
 import { Assessment, AnswerTemplate, BNCC, Descritor } from './types';
-import Modal from './components/Modal';
+import { Icons } from './components/Icons';
+
 
 // Mock Pages/Components for routing
 const AssessmentsDashboard = () => {
     return (
         <div className="p-8">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800">Assessments Dashboard</h1>
-                <NavLink to="/builder" className="px-5 py-2 font-semibold text-white bg-primary-600 rounded-md hover:bg-primary-700 shadow-sm">
-                    Create New Assessment
-                </NavLink>
-            </div>
-             <div className="bg-white rounded-lg shadow border overflow-x-auto">
-                <table className="w-full text-sm text-left text-gray-500">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+             <div className="bg-white rounded-lg shadow-sm border overflow-x-auto">
+                <table className="w-full text-sm text-left text-slate-500">
+                    <thead className="text-xs text-slate-700 uppercase bg-slate-50">
                         <tr>
-                            <th scope="col" className="px-6 py-3">Title</th>
-                            <th scope="col" className="px-6 py-3">Subject</th>
-                            <th scope="col" className="px-6 py-3">Status</th>
-                            <th scope="col" className="px-6 py-3">Last Modified</th>
-                            <th scope="col" className="px-6 py-3">Actions</th>
+                            <th scope="col" className="px-6 py-3 font-medium">Title</th>
+                            <th scope="col" className="px-6 py-3 font-medium">Subject</th>
+                            <th scope="col" className="px-6 py-3 font-medium">Status</th>
+                            <th scope="col" className="px-6 py-3 font-medium">Last Modified</th>
+                            <th scope="col" className="px-6 py-3 font-medium text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {MOCK_ASSESSMENTS.map((assessment: Assessment) => (
-                            <tr key={assessment.id} className="bg-white border-b hover:bg-gray-50">
-                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{assessment.title}</td>
+                            <tr key={assessment.id} className="bg-white border-b border-slate-200 hover:bg-slate-50">
+                                <td className="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">{assessment.title}</td>
                                 <td className="px-6 py-4">{assessment.subject}</td>
-                                <td className="px-6 py-4"><span className={`px-2 py-1 text-xs font-medium rounded-full ${assessment.status === 'Published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>{assessment.status}</span></td>
+                                <td className="px-6 py-4"><span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${assessment.status === 'Published' ? 'bg-green-100 text-green-800' : assessment.status === 'Draft' ? 'bg-yellow-100 text-yellow-800' : 'bg-slate-100 text-slate-800'}`}>{assessment.status}</span></td>
                                 <td className="px-6 py-4">{assessment.lastModified}</td>
-                                <td className="px-6 py-4 flex gap-2">
-                                    <button className="font-medium text-primary-600 hover:underline">Edit</button>
-                                    <button className="font-medium text-red-600 hover:underline">Delete</button>
+                                <td className="px-6 py-4 flex justify-center gap-4">
+                                    <button className="font-medium text-primary-600 hover:text-primary-800"><Icons.Edit className="w-4 h-4" /></button>
+                                    <button className="font-medium text-red-500 hover:text-red-700"><Icons.Delete className="w-4 h-4" /></button>
                                 </td>
                             </tr>
                         ))}
@@ -50,17 +44,11 @@ const AssessmentsDashboard = () => {
 
 const TemplateManager = () => (
     <div className="p-8">
-        <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-gray-800">Template Management</h1>
-            <button className="px-5 py-2 font-semibold text-white bg-primary-600 rounded-md hover:bg-primary-700 shadow-sm">
-                Create New Template
-            </button>
-        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {MOCK_TEMPLATES.map((template: AnswerTemplate) => (
-                <div key={template.id} className="bg-white p-6 rounded-lg shadow-md border">
-                    <h3 className="text-lg font-semibold text-gray-800">{template.name}</h3>
-                    <p className="text-sm text-gray-600 mt-2">{template.description}</p>
+                <div key={template.id} className="bg-white p-6 rounded-lg shadow-sm border">
+                    <h3 className="text-lg font-semibold text-slate-800">{template.name}</h3>
+                    <p className="text-sm text-slate-600 mt-2">{template.description}</p>
                     <div className="mt-4 pt-4 border-t flex justify-end gap-2">
                         <button className="text-sm font-medium text-primary-600 hover:underline">Edit</button>
                         <button className="text-sm font-medium text-red-600 hover:underline">Delete</button>
@@ -79,67 +67,51 @@ const SettingsPage = () => {
         switch (activeTab) {
             case 'drive':
                 return (
-                    <div>
-                        <h2 className="text-xl font-semibold mb-4">Google Drive Sync Settings</h2>
-                        <div className="space-y-6">
-                            <div className="p-4 border rounded-lg flex justify-between items-center">
+                    <div className="space-y-6">
+                        <div className="p-6 border rounded-lg bg-white shadow-sm">
+                            <div className="flex justify-between items-center">
                                 <div>
-                                    <h3 className="font-medium">Account Connection</h3>
-                                    <p className="text-sm text-gray-500">user@example.com</p>
+                                    <h3 className="font-semibold text-slate-800">Account Connection</h3>
+                                    <p className="text-sm text-slate-500">user@example.com</p>
                                 </div>
-                                <button className="px-4 py-2 text-sm text-red-600 border border-red-300 rounded-md hover:bg-red-50">Disconnect</button>
+                                <button className="px-4 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors">Disconnect</button>
                             </div>
-                            <div className="p-4 border rounded-lg">
-                                <h3 className="font-medium mb-2">Synchronization Preferences</h3>
-                                <div className="flex items-center justify-between">
-                                    <p className="text-sm">Enable background synchronization</p>
-                                    <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                                        <input type="checkbox" name="toggle" id="toggle" className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                                        <label htmlFor="toggle" className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-                                    </div>
-                                </div>
-                            </div>
-                            <button className="w-full flex justify-center items-center gap-2 px-4 py-2 font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700">
-                                <GoogleDriveIcon className="!h-4 !w-4" /> Sync Now
-                            </button>
                         </div>
+                        <div className="p-6 border rounded-lg bg-white shadow-sm">
+                            <h3 className="font-semibold text-slate-800 mb-4">Synchronization Preferences</h3>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm">Enable background synchronization</p>
+                                <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" name="toggle" id="toggle" className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                    <label htmlFor="toggle" className="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <button className="w-full flex justify-center items-center gap-2 px-4 py-2 font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors">
+                            <GoogleDriveIcon className="!h-4 !w-4" /> Sync Now
+                        </button>
                     </div>
                 );
             case 'bncc':
                 return (
-                    <div>
-                        <h2 className="text-xl font-semibold mb-4">BNCC Management</h2>
-                        <div className="flex justify-end gap-2 mb-4">
-                            <button className="px-4 py-2 text-sm font-medium border rounded-md">Import</button>
-                            <button className="px-4 py-2 text-sm font-medium border rounded-md">Export</button>
-                             <button className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700">Add New</button>
-                        </div>
-                        <div className="bg-white rounded-lg shadow border">
-                            <table className="w-full text-sm text-left text-gray-500">
-                                <thead className="text-xs text-gray-700 uppercase bg-gray-50"><tr><th className="px-6 py-3">Code</th><th className="px-6 py-3">Description</th><th className="px-6 py-3">Actions</th></tr></thead>
-                                <tbody>
-                                    {MOCK_BNCC.map((bncc: BNCC) => <tr key={bncc.id} className="border-b hover:bg-gray-50"><td className="px-6 py-4 font-mono">{bncc.code}</td><td className="px-6 py-4">{bncc.description}</td><td className="px-6 py-4 flex gap-2"><button className="font-medium text-primary-600 hover:underline">Edit</button></td></tr>)}
-                                </tbody>
-                            </table>
-                        </div>
+                    <div className="bg-white rounded-lg shadow-sm border">
+                        <table className="w-full text-sm text-left text-slate-500">
+                            <thead className="text-xs text-slate-700 uppercase bg-slate-50"><tr><th className="px-6 py-3 font-medium">Code</th><th className="px-6 py-3 font-medium">Description</th><th className="px-6 py-3 font-medium">Actions</th></tr></thead>
+                            <tbody>
+                                {MOCK_BNCC.map((bncc: BNCC) => <tr key={bncc.id} className="border-b hover:bg-slate-50"><td className="px-6 py-4 font-mono">{bncc.code}</td><td className="px-6 py-4">{bncc.description}</td><td className="px-6 py-4 flex gap-2"><button className="font-medium text-primary-600 hover:underline">Edit</button></td></tr>)}
+                            </tbody>
+                        </table>
                     </div>
                 );
             case 'descritores':
                 return (
-                    <div>
-                        <h2 className="text-xl font-semibold mb-4">Descritores Management</h2>
-                        <div className="flex justify-end gap-2 mb-4">
-                            <button className="px-4 py-2 text-sm font-medium border rounded-md">Import</button>
-                             <button className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700">Add New</button>
-                        </div>
-                        <div className="bg-white rounded-lg shadow border">
-                             <table className="w-full text-sm text-left text-gray-500">
-                                <thead className="text-xs text-gray-700 uppercase bg-gray-50"><tr><th className="px-6 py-3">Code</th><th className="px-6 py-3">Description</th><th className="px-6 py-3">Actions</th></tr></thead>
-                                <tbody>
-                                    {MOCK_DESCRITORES.map((d: Descritor) => <tr key={d.id} className="border-b hover:bg-gray-50"><td className="px-6 py-4 font-mono">{d.code}</td><td className="px-6 py-4">{d.description}</td><td className="px-6 py-4 flex gap-2"><button className="font-medium text-primary-600 hover:underline">Edit</button></td></tr>)}
-                                </tbody>
-                            </table>
-                        </div>
+                     <div className="bg-white rounded-lg shadow-sm border">
+                         <table className="w-full text-sm text-left text-slate-500">
+                            <thead className="text-xs text-slate-700 uppercase bg-slate-50"><tr><th className="px-6 py-3 font-medium">Code</th><th className="px-6 py-3 font-medium">Description</th><th className="px-6 py-3 font-medium">Actions</th></tr></thead>
+                            <tbody>
+                                {MOCK_DESCRITORES.map((d: Descritor) => <tr key={d.id} className="border-b hover:bg-slate-50"><td className="px-6 py-4 font-mono">{d.code}</td><td className="px-6 py-4">{d.description}</td><td className="px-6 py-4 flex gap-2"><button className="font-medium text-primary-600 hover:underline">Edit</button></td></tr>)}
+                            </tbody>
+                        </table>
                     </div>
                 );
             default: return null;
@@ -147,12 +119,11 @@ const SettingsPage = () => {
     }
 
     const getTabClass = (tabName: string) => 
-        `px-4 py-2 font-medium text-sm rounded-md ${activeTab === tabName ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'}`;
+        `px-3 py-2 font-semibold text-sm rounded-md transition-colors ${activeTab === tabName ? 'bg-primary-100 text-primary-700' : 'text-slate-600 hover:bg-slate-200'}`;
     
     return (
         <div className="p-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Settings</h1>
-            <div className="flex gap-2 mb-6 border-b">
+            <div className="flex gap-2 mb-6">
                 <button onClick={() => setActiveTab('drive')} className={getTabClass('drive')}>Google Drive</button>
                 <button onClick={() => setActiveTab('bncc')} className={getTabClass('bncc')}>BNCC</button>
                 <button onClick={() => setActiveTab('descritores')} className={getTabClass('descritores')}>Descritores</button>
@@ -163,23 +134,24 @@ const SettingsPage = () => {
     );
 }
 
-// FIX: Added an explicit interface for NavItem props to resolve typing issue.
 interface NavItemProps {
   to: string;
+  icon: React.ReactNode;
   children: React.ReactNode;
 }
-const NavItem = ({ to, children }: NavItemProps) => {
+const NavItem: React.FC<NavItemProps> = ({ to, icon, children }) => {
     return (
         <NavLink
             to={to}
             className={({ isActive }) =>
-                `flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                `flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors duration-200 ${
                 isActive
                     ? 'bg-primary-600 text-white shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'
                 }`
             }
         >
+            {icon}
             {children}
         </NavLink>
     );
@@ -189,57 +161,95 @@ const MainLayout = () => {
     const location = useLocation();
     
     const sidebarLinks = [
-        { path: '/', name: 'Assessments' },
-        { path: '/bank', name: 'Question Bank' },
-        { path: '/builder', name: 'Builder' },
-        { path: '/templates', name: 'Templates' },
-        { path: '/settings', name: 'Settings' },
+        { path: '/', name: 'Assessments', icon: <Icons.Assessments className="w-5 h-5" /> },
+        { path: '/bank', name: 'Question Bank', icon: <Icons.Bank className="w-5 h-5" /> },
+        { path: '/builder', name: 'Builder', icon: <Icons.Builder className="w-5 h-5" /> },
+        { path: '/templates', name: 'Templates', icon: <Icons.Templates className="w-5 h-5" /> },
     ];
+
+    const getPageTitle = () => {
+        const currentLink = [...sidebarLinks, { path: '/settings', name: 'Settings' }].find(link => location.pathname === link.path);
+        return currentLink ? currentLink.name : "Dashboard";
+    }
+
+    const getPageActions = () => {
+        switch(location.pathname) {
+            case '/':
+                return (
+                    <NavLink to="/builder" className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 shadow-sm transition-colors">
+                        <Icons.Add className="w-4 h-4" />
+                        New Assessment
+                    </NavLink>
+                )
+            case '/bank':
+                 return (
+                    <button onClick={() => alert('Add New Question')} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 shadow-sm transition-colors">
+                        <Icons.Add className="w-4 h-4" />
+                        Add Question
+                    </button>
+                )
+            case '/templates':
+                 return (
+                    <button className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 shadow-sm transition-colors">
+                       <Icons.Add className="w-4 h-4" /> New Template
+                    </button>
+                )
+            default:
+                return null;
+        }
+    }
     
     return (
-        <div className="flex h-screen bg-gray-100">
-            <aside className="w-64 bg-white border-r flex flex-col">
-                <div className="h-16 flex items-center justify-center border-b">
-                    <h1 className="text-2xl font-bold text-primary-600">Assess.AI</h1>
+        <div className="flex h-screen bg-slate-100 font-sans">
+            <aside className="w-64 bg-white border-r border-slate-200 flex flex-col">
+                <div className="h-16 flex items-center px-6 border-b border-slate-200">
+                     <Icons.Logo className="w-8 h-8 text-primary-600" />
+                    <h1 className="text-xl font-bold text-slate-800 ml-2">Assess.AI</h1>
                 </div>
-                <nav className="flex-1 p-4 space-y-2">
+                <nav className="flex-1 p-4 space-y-1">
                     {sidebarLinks.map(link => (
-                         <NavItem key={link.path} to={link.path}>{link.name}</NavItem>
+                         <NavItem key={link.path} to={link.path} icon={link.icon}>{link.name}</NavItem>
                     ))}
                 </nav>
+                 <div className="p-4 border-t border-slate-200">
+                    <NavItem to="/settings" icon={<Icons.Settings className="w-5 h-5" />}>Settings</NavItem>
+                 </div>
             </aside>
-            <main className="flex-1 overflow-y-auto bg-slate-50">
-                <Routes>
-                    <Route path="/" element={<AssessmentsDashboard />} />
-                    <Route path="/bank" element={<QuestionBankEditor />} />
-                    <Route path="/builder" element={<AssessmentBuilder />} />
-                    <Route path="/templates" element={<TemplateManager />} />
-                    <Route path="/settings" element={<SettingsPage />} />
-                </Routes>
-            </main>
+            <div className="flex-1 flex flex-col">
+                <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
+                    <h2 className="text-xl font-bold text-slate-800">{getPageTitle()}</h2>
+                    <div>{getPageActions()}</div>
+                </header>
+                <main className="flex-1 overflow-y-auto">
+                    <Routes>
+                        <Route path="/" element={<AssessmentsDashboard />} />
+                        <Route path="/bank" element={<QuestionBankEditor />} />
+                        <Route path="/builder" element={<AssessmentBuilder />} />
+                        <Route path="/templates" element={<TemplateManager />} />
+                        <Route path="/settings" element={<SettingsPage />} />
+                    </Routes>
+                </main>
+            </div>
         </div>
     );
 };
 
-// FIX: Added explicit props interface for ApiKeyChecker to resolve typing issue.
 interface ApiKeyCheckerProps {
-    children: React.ReactNode;
+    children?: React.ReactNode;
 }
 const ApiKeyChecker = ({ children }: ApiKeyCheckerProps) => {
-    // FIX: Use process.env.API_KEY as per guidelines.
     const apiKey = process.env.API_KEY;
 
     if (!apiKey) {
         return (
-            <div className="flex h-screen items-center justify-center bg-slate-100 p-4">
-                <div className="text-center p-8 bg-white shadow-lg rounded-lg max-w-lg border border-red-200">
+            <div className="flex h-screen items-center justify-center bg-slate-100 p-4 font-sans">
+                <div className="text-center p-8 bg-white shadow-xl rounded-lg max-w-lg border border-red-200">
                     <h1 className="text-2xl font-bold text-red-700">Configuration Error</h1>
-                    <p className="mt-4 text-gray-700">
+                    <p className="mt-4 text-slate-700">
                         The AI features of this application require a Google Gemini API key, which has not been configured.
                     </p>
-                    <p className="mt-2 text-gray-600 text-sm">
-                        {/* FIX: Updated instructions to use API_KEY environment variable. */}
-                        To enable AI functionality, please create an environment variable named <code className="bg-red-100 text-red-800 px-1 py-0.5 rounded font-mono">API_KEY</code> with your API key as the value, and then restart the application.
+                    <p className="mt-2 text-slate-600 text-sm">
+                        To enable AI functionality, please ensure the <code className="bg-red-100 text-red-800 px-1.5 py-1 rounded font-mono text-[11px]">API_KEY</code> environment variable is set in your deployment configuration.
                     </p>
                 </div>
             </div>

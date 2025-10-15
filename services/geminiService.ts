@@ -12,7 +12,6 @@ const getAI = (): GoogleGenAI => {
     }
     
     // FIX: Use process.env.API_KEY to access the API key as per guidelines.
-    // This application requires the API_KEY environment variable to be set.
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
         // This error will be caught by the calling function's try/catch block.
