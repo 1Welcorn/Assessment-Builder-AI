@@ -1,5 +1,3 @@
-// Fix: Add reference to Vite client types to resolve `import.meta.env`.
-/// <reference types="vite/client" />
 
 import React, { useState } from 'react';
 import { HashRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
@@ -241,8 +239,8 @@ interface ApiKeyCheckerProps {
     children?: React.ReactNode;
 }
 const ApiKeyChecker = ({ children }: ApiKeyCheckerProps) => {
-    // CORRECT: Use import.meta.env.VITE_API_KEY for client-side environment variables in Vite.
-    const apiKey = import.meta.env.VITE_API_KEY;
+    // Fix: Use process.env.API_KEY as per the coding guidelines.
+    const apiKey = process.env.API_KEY;
 
     if (!apiKey) {
         return (
@@ -253,7 +251,7 @@ const ApiKeyChecker = ({ children }: ApiKeyCheckerProps) => {
                         A Google Gemini API key is required for AI features, but it has not been configured.
                     </p>
                     <p className="mt-2 text-slate-600 text-sm">
-                        To fix this, go to your deployment settings (e.g., on Vercel) and add an environment variable named <code className="bg-red-100 text-red-800 px-1.5 py-1 rounded font-mono text-[11px]">VITE_API_KEY</code> with your key as the value.
+                        To fix this, go to your deployment settings (e.g., on Vercel) and add an environment variable named <code className="bg-red-100 text-red-800 px-1.5 py-1 rounded font-mono text-[11px]">API_KEY</code> with your key as the value.
                     </p>
                 </div>
             </div>
